@@ -1,0 +1,118 @@
+html {
+  font-size: 14px;
+}
+
+:root {
+    --bs-primary: #295868;
+    --bs-primary-hover: #8ACDBF;
+    --bs-primary-hover-list: #357387;
+    --bs-secondary: #EFF8FF;
+    --bs-success: #20c997;
+    --bs-info: #0dcaf0;
+    --bs-warning: #ffc107;
+    --bs-danger: #dc3545;
+    --bs-primary-rgb: 41, 88, 104;
+    --bs-secondary-rgb: 239, 248, 225;
+    --bs-success-rgb: 32, 201, 151;
+    --bs-info-rgb: 13, 202, 240;
+    --bs-warning-rgb: 255, 193, 7;
+    --bs-danger-rgb: 220, 53, 69;
+    --bs-font-sans-serif: "Poppins Regular";
+    --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Poppins", "Poppins", monospace;
+    --bs-body-font-family: var(--bs-font-sans-serif);
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.btn-actions {
+    justify-content: center;
+    border-radius: .5rem;
+    padding: .45rem;
+    min-width: 2.5rem;
+    border: 0;
+    color: #fff;
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+    .btn-actions:hover {
+        background-color: var(--bs-primary-hover);
+        color: var(--bs-primary);
+    }
+    
+.form-actions {
+    display: inline-flex;
+    justify-content: center;
+    border-radius: .5rem;
+    min-width: 2.5rem;
+}
+
+.px-6 {
+    padding-right: 5rem !important;
+    padding-left: 5rem !important;
+}
+
+.px-7 {
+    padding-right: 7rem !important;
+    padding-left: 7rem !important;
+}
+
+.px-8 {
+    padding-right: 10rem !important;
+    padding-left: 10rem !important;
+}
+
+.px-9 {
+    padding-right: 12rem !important;
+    padding-left: 12rem !important;
+}
+
+.px-10 {
+    padding-right: 14rem !important;
+    padding-left: 14rem !important;
+}
+
+.breadcrumb-item {
+    font-family: "Poppins SemiBold";
+    color: var(--bs-primary)
+}
+
+#sortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+}
+
+    #sortable li {
+        margin: 0 3px 3px 3px;
+        padding: 0.4em;
+        padding-left: 1.5em;
+        font-size: 1.4em;
+        height: 18px;
+    }
+
+        #sortable li span {
+            position: absolute;
+            margin-left: -1.3em;
+        }
+
+.font-smal {
+    font-size: 0.7rem;
+}

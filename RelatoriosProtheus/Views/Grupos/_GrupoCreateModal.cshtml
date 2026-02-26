@@ -1,0 +1,48 @@
+﻿@model RelatoriosProtheus.Models.Entities.Grupo
+
+<div class="modal fade" id="grupoCreateModal" tabindex="-1" aria-labelledby="grupoCreateModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="grupoCreateModal">Criar Novo Grupo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nome" class="form-label"></label>
+                        <input asp-for="Nome" class="form-control" />
+                        <span asp-validation-for="Nome" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Cor" class="form-label"></label>
+                        <input asp-for="Cor" class="form-control" />
+                        <span asp-validation-for="Cor" class="text-danger"></span>
+                    </div>
+                    <label class="form-label">Grupo de Separação</label>
+                    <br />
+                    <div class="mb-4" style="display: inline-flex">
+                        <div class="mb-4" style="display: inline-flex">
+                            <div class="form-check" style="margin-right: 10px">
+                                <input asp-for="GrupoSeparacao" class="form-check-input" type="radio" value="1" id="GrupoSeparacao1" />
+                                <label class="form-check-label" for="GrupoSeparacao1">Protheus Backoffice</label>
+                            </div>
+                            <div class="form-check">
+                                <input asp-for="GrupoSeparacao" class="form-check-input" type="radio" value="2" id="GrupoSeparacao2" />
+                                <label class="form-check-label" for="GrupoSeparacao2">RH</label>
+                            </div>
+                            <span asp-validation-for="GrupoSeparacao" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

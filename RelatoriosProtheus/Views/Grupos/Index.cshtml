@@ -1,0 +1,51 @@
+﻿@model IEnumerable<RelatoriosProtheus.Models.Entities.Grupo>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Grupos</h1>
+
+<button type="button"
+        class="btn btn-outline-secondary bi bi bi-collection"
+        data-bs-toggle="modal"
+        data-bs-target="#grupoCreateModal"
+        title="Adicionar Novos Grupos"
+        style="float: right">
+    <span class="ms-2">Novo Grupo</span>
+</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cor)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Cor)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.GrupoId" class="btn-actions btn-primary text-center text-decoration-none">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.GrupoId" class="btn-actions btn-primary text-center text-decoration-none">Deletar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@await Html.PartialAsync(
+                    "_GrupoCreateModal",
+                    new RelatoriosProtheus.Models.Entities.Grupo())

@@ -1,0 +1,117 @@
+﻿@using System.Security.Claims
+@{
+    var claims = string.Join(",", ((ClaimsIdentity)User.Identity).Claims.ToList());
+}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - RelatoriosProtheus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/RelatoriosProtheus.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100" style="font-family: 'Poppins', sans-serif;">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Relatorios")">
+                    <div style="display: inline-grid">
+                        <img src="~/img/SESI_SENAI.png" alt="SESI/SENAI" height="40" width="200px" />
+                        <span class="fw-bold">Relatórios Protheus</span>
+                    </div>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (claims.Contains("Administrador") || claims.Contains("Gestor"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Grupos" asp-action="Index">
+                                        <i class="bi bi-collection me-1"></i> Grupos
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Perfils" asp-action="Index">
+                                        <i class="bi bi-layout-text-sidebar me-1"></i> Perfis
+                                    </a>
+                                </li>                                
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Auth" asp-action="Index">
+                                        <i class="bi bi-people me-1"></i> Usuarios
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Relatorios" asp-action="RelatoriosGrupos">
+                                        <i class="bi bi-archive me-1"></i> Relatórios
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle fs-4 me-1"></i>
+                                    <span>@User.Identity.Name</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Auth" asp-action="Edit" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier).Value">Editar</a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><form asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-1"></i> Sair
+                                        </button>
+                                    </form></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Index">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div style="height: 70px;"></div>
+    </header>
+
+    <main class="container flex-fill py-4 mt-5">
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-ui-1.14.0/jquery-ui.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.min.js" asp-append-version="true"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.1/js/dataTables.buttons.min.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    @await Component.InvokeAsync("Notyf")
+</body>
+</html>

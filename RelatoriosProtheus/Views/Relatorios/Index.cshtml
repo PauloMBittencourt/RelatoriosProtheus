@@ -1,0 +1,392 @@
+﻿@using System.Globalization
+@using RelatoriosProtheus.Models.Entities
+@using RelatoriosProtheus.Models.ViewModels
+@using System.Security.Claims
+@model RelatoriosProtheus.Models.ViewModels.RelatorioFiltroViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "_Layout";
+    var claims = string.Join(",", ((ClaimsIdentity)User.Identity).Claims.ToList());
+}
+
+<main class="container mb-5">
+    <div class="card mb-5">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Filtros</h2>
+                <div>
+                    <button type="submit" form="filtroForm" class="btn btn-primary me-2">
+                        <i class="bi bi-filter"></i> Filtrar
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="limparFiltros()">
+                        <i class="bi bi-x"></i> Limpar Filtros
+                    </button>
+                </div>
+            </div>
+            <form asp-action="Index" method="get" id="filtroForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Grupo</label>
+                        <select asp-for="GrupoSelecionadoId"
+                                asp-items="@(new SelectList(Model.GruposDisponiveis ?? new List<Grupo>(), "GrupoId", "Nome"))"
+                                class="form-select">
+                            <option value="">Todos os grupos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Pesquisar</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" asp-for="DescricaoRelatorio" class="form-control" placeholder="Buscar por palavra-chave" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <button type="button"
+            class="btn btn-outline-secondary bi bi-clipboard2-data-fill"
+            data-bs-toggle="modal"
+            data-bs-target="#relatorioCreateModal"
+            onclick="loadCreateModal()"
+            title="Adicionar Novos Relatórios">
+        <span class="ms-2">Novo Relatório</span>
+    </button>
+
+    <br />
+
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+        <h2 class="h4 mb-0">Relatórios Disponíveis</h2>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary active">
+                <i class="bi bi-grid"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary">
+                <i class="bi bi-file-spreadsheet"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @if (Model.Relatorios.Any())
+        {
+            foreach (var report in Model.Relatorios)
+            {
+                <div class="col">
+                    <div class="card shadow-sm h-100 rounded-4 border-0 me-2" style="min-width: 300px">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="fw-semibold">@report.Nome</h5>
+                                    <p class="text-muted small mb-2">@report.Descricao</p>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm p-0"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    @if (claims.Contains("Administrador") || claims.Contains("Gestor"))
+                                    {
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" asp-controller="Relatorios" asp-action="Edit" asp-route-id="@report.Id">Editar</a></li>
+                                            <li><a class="dropdown-item" asp-controller="Relatorios" asp-action="Delete" asp-route-id="@report.Id">Excluir</a></li>
+                                        </ul>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                @foreach (var grupoRel in (report.RelatorioGrupos ?? Enumerable.Empty<RelatoriosProtheus.Models.Entities.RelatorioGrupo>())
+                               .Where(r => r.RelatoriosId == report.Id))
+                                {
+                                    var corGrupo = grupoRel.GrupoFk?.Cor ?? "white";
+                                    <span class="badge border rounded-pill"
+                                          style="color:@corGrupo; border-color: @corGrupo !important">
+                                        @grupoRel.GrupoFk?.Nome
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0 d-flex">
+                            <form asp-action="Parametros" method="get" class="me-2 param-form">
+                                <input type="hidden" name="id" value="@report.Id" />
+                                <input type="hidden" name="acao" value="visualizar" />
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-eye-fill"></i> Ver
+                                </button>
+                            </form>
+                            <form asp-action="Parametros" method="get" class="me-2 param-form">
+                                <input type="hidden" name="id" value="@report.Id" />
+                                <input asp-for="TipoArquivo" value="0" hidden />
+                                <input type="hidden" name="acao" value="download" />
+                                <button type="submit" class="btn btn-outline-secondary w-60" style="color: orangered; border-color: orangered">
+                                    <img src="~/img/pdf_logo.png"></img> <span class="font-smal">Download</span>
+                                </button>
+                            </form>
+                            <form asp-action="Parametros" method="get" class="me-2 param-form">
+                                <input type="hidden" name="id" value="@report.Id" />
+                                <input asp-for="TipoArquivo" value="1" hidden />
+                                <input type="hidden" name="acao" value="download" />
+                                <button type="submit" class="btn btn-outline-secondary w-60" style="color: darkgreen; border-color: darkgreen">
+                                    <img src="~/img/excel_logo.png"></img> <span class="font-smal">Download</span>
+                                </button>
+                            </form>
+                            <form asp-action="Parametros" method="get" class="param-form">
+                                <input type="hidden" name="id" value="@report.Id" />
+                                <input asp-for="TipoArquivo" value="2" hidden />
+                                <input type="hidden" name="acao" value="download" />
+                                <button type="submit" class="btn btn-outline-secondary w-60" style="color: dodgerblue; border-color: dodgerblue">
+                                    <img src="~/img/doc_logo.png"></img> <span class="font-smal">Download</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    Nenhum relatório para exibir.
+                </div>
+            </div>
+        }
+    </div>
+</main>
+
+<div class="modal fade" id="modalMensagem" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <span asp-validation-summary></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        function createSpinner(id = 'pdfLoadingSpinner') {
+            const spinner = document.createElement('div');
+            spinner.id = id;
+            spinner.className = 'pdf-spinner-overlay';
+            spinner.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+            return spinner;
+        }
+
+        function getCookie(name) {
+            try {
+                return document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith(`${name}=`))
+                    ?.split('=')[1];
+            } catch {
+                return null;
+            }
+        }
+
+        function checkDownloadStatus() {
+            const status = getCookie('DownloadStatus');
+            if (status === 'success') {
+                $('.modal').modal('hide');
+                $('#modalBody').html('Relatório baixado com sucesso!');
+                $('#modalMensagem').modal('show');
+                document.cookie = 'DownloadStatus=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+        }
+
+        let paramModalInstance = null;
+
+        function loadCreateModal() {
+            $('.modal').modal('hide');
+
+            $.ajax({
+                url: '@Url.Action("Create", "Relatorios")',
+                method: 'GET',
+                success: function(data) {
+                    $.validator.unobtrusive.parse("#wizardForm");
+                    $('#relatorioCreateModal').remove();
+                    $('body').append(data);
+
+                    const modal = new bootstrap.Modal(document.getElementById('relatorioCreateModal'));
+                    modal.show();
+
+                    $('#relatorioCreateModal').on('hidden.bs.modal', function() {
+                        modal.dispose();
+                        $(this).remove();
+                    });
+                }
+            });
+        }
+
+        function openParamModal(data) {
+            $('.modal').modal('hide');
+
+            $('#relatorioModal').remove();
+            $('body').append(data);
+
+            paramModalInstance = new bootstrap.Modal(document.getElementById('relatorioModal'));
+            paramModalInstance.show();
+
+            $('#relatorioModal').on('hidden.bs.modal', function() {
+                const focused = document.activeElement;
+                if (focused && $(this).has(focused).length) {
+                  focused.blur();
+                }
+                if (paramModalInstance) {
+                    paramModalInstance.dispose();
+                    paramModalInstance = null;
+                }
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+                document.body.classList.remove('modal-open');
+
+                $(this).remove();
+            });
+
+            const form = document.getElementById('relatorioForm');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    if (!$(this).valid()) {
+                        return;
+                    }
+
+                    const formData = new FormData(this);
+                    const isVisualizar = document.getElementById('Acao').value === 'visualizar';
+
+                    const spinner = createSpinner();
+                    this.parentElement.appendChild(spinner);
+
+                    try {
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        spinner.remove();
+
+                        if (isVisualizar) {
+                            if (response.headers.get('content-type').includes('text/html')) {
+                                const html = await response.text();
+
+                                $('body').append(html);
+
+                                const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+                                pdfModal.show();
+
+                                $('#pdfModal').on('hidden.bs.modal', function() {
+                                    $(this).remove();
+                                });
+
+                               const relModal = bootstrap.Modal.getInstance(document.getElementById('relatorioModal'));
+                               if (relModal) relModal.hide();
+                            } else {
+                                const error = await response.json();
+                                showModalError(error.message || "Erro desconhecido");
+                            }
+                        } else {
+                            this.target = 'downloadFrame';
+                            this.submit();
+
+                            setTimeout(() => {
+                               const relModal = bootstrap.Modal.getInstance(document.getElementById('relatorioModal'));
+                               if (relModal) relModal.hide();
+                            }, 500);
+                        }
+                    } catch (error) {
+
+                        spinner.remove();
+                        const pdfModalEl = document.getElementById('relatorioModal');
+                        if (pdfModalEl) {
+                            const pdfModal = bootstrap.Modal.getInstance(pdfModalEl) || new bootstrap.Modal(pdfModalEl);
+                            pdfModal.hide();
+                        }
+                    }
+                });
+            }
+        }
+
+        $(document).ready(function () {
+             var modal = document.getElementById('Modal')
+             modal?.addEventListener('show.bs.modal', function (event) {
+                 var size = $(event.relatedTarget).data('bs-size');
+                 if (size != null) {
+                    $('.modal-dialog').addClass("modal-" + size);
+                 }
+                 $('.modal-title').text($(event.relatedTarget).text());
+                 Load(".modal-load", event.relatedTarget.getAttribute("formaction"));
+             });
+        });
+        function Load(target, url) {
+            $(target).load(url);
+        }
+
+
+        $(function() {
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                                const errorMessage = @Html.Raw(Json.Serialize(TempData["ErrorMessage"]));
+                                $('#modalBody').html(errorMessage);
+                                new bootstrap.Modal(document.getElementById('modalMensagem')).show();
+            </text>
+        }
+            setInterval(checkDownloadStatus, 500);
+
+            $(document).on('submit', '.param-form', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'GET',
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        openParamModal(data);
+                    },
+                    error: function(xhr) {
+                        $('#modalBody').html('Erro ao carregar parâmetros');
+                        $('#modalMensagem').modal('show');
+                    }
+                });
+            });
+
+            window.limparFiltros = function() {
+                const form = document.getElementById('filtroForm');
+                if (!form) return;
+
+                form.querySelectorAll('input, select').forEach(element => {
+                    if (element.name === 'GrupoSelecionadoId') element.value = '';
+                    if (element.name === 'DescricaoRelatorio') element.value = '';
+                });
+
+                form.submit();
+            }
+        });
+    </script>
+}
+<style>
+    .pdf-spinner-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1050;
+    }
+</style>

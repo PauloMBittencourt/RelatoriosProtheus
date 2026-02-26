@@ -1,0 +1,44 @@
+﻿@model IEnumerable<RelatoriosProtheus.Models.Entities.Perfil>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "_Layout";
+}
+
+<h1>Perfis</h1>
+
+<p>
+    <a class="btn btn-outline-secondary bi bi-person-vcard-fill" asp-action="Create"> Criar Novo Perfil</a>
+</p>
+@if(Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Descricao)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Descricao)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-actions btn-primary text-center text-decoration-none">Editar</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn-actions btn-primary text-center text-decoration-none">Deletar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} else
+{
+<div>
+    <span>Nenhum Perfil</span>
+</div>    
+
+}

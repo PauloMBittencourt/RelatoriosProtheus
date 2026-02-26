@@ -1,0 +1,47 @@
+﻿h6 {
+    border: 1px solid #ddd;
+    padding: .5rem 1.5rem;
+    color: var(--bs-primary);
+    background-color: var(--bs-secondary);
+}
+
+.list-item {
+    width: 100%;
+    height: 380px;
+    padding: .5rem 1rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.item-perfil {
+    font-size: 16px;
+    padding: 14px 16px 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.item-list-user {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+    .item-list-user:hover {
+        background-color: var(--bs-primary-hover-list);
+    }
+
+.item-list-perfil {
+    background-color: white;
+    color: #808080;
+    border: 1px solid var(--bs-primary);
+}
+
+    .item-list-perfil:hover {
+        color: var(--bs-primary);
+        background-color: var(--bs-secondary);
+    }
+
+    .item-list-perfil span {
+        color: var(--bs-primary);
+    }

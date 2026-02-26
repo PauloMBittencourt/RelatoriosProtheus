@@ -1,0 +1,104 @@
+﻿@model RelatoriosProtheus.Models.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Ciclo - Editar";
+}
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.ActionLink("Index")">Usuários (Perfis)</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Grupo</li>
+    </ol>
+</nav>
+<hr />
+<div class="widget-container row">
+    <input id="funcionarioId" value="@Model.FuncionarioId" hidden />
+    <div class="col-4 col-md">
+        <h6>Grupos</h6>
+        <div id="plannedList">
+            @if (ViewBag.Grupos != null)
+            {
+                <ul id="listGeral" class="list-drag list-item">
+
+                    @foreach (var item in ViewBag.Grupos)
+                    {
+                        <li data-item-id="@item" class="item-perfil item-list-perfil d-flex justify-content-between">@item<span class="bi bi-chevron-double-right"></span></li>
+                    }
+                </ul>
+                <div class="dx-scrollable-scrollbar dx-widget dx-scrollbar-vertical dx-scrollbar-hoverable" style=""><div class="dx-scrollable-scroll dx-state-invisible" style="height: 140px; transform: translate(0px, 0px);"><div class="dx-scrollable-scroll-content"></div></div></div>
+            }
+        </div>
+    </div>
+    <div class="col-4 col-md">
+        <h6>@Model.Email</h6>
+        <div id="doingList">
+            @if (Model.Grupos != null)
+            {
+                <ul id="listUsuario" class="list-drag list-item">
+                    @foreach (var item in Model.Grupos)
+                    {
+                        <li data-item-id="@item" class="item-perfil item-list-user d-flex justify-content-between">@item<span class="bi bi-chevron-double-left"></span></li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(function () {
+            $(".list-drag").sortable({
+                connectWith: ".list-drag",
+                receive: function (event, ui) {
+                    alterIconSpan(ui.item.find('span'));
+                    alterColorLi(ui.item);
+                    updateLists();
+                },
+            }).disableSelection();
+
+            function alterIconSpan(el){
+                var filho = el;
+                if (filho.hasClass("bi-chevron-double-right")) {
+                    filho.removeClass("bi-chevron-double-right");
+                    filho.addClass("bi-chevron-double-left");
+                } else if (filho.hasClass("bi-chevron-double-left")) {
+                    filho.removeClass("bi-chevron-double-left");
+                    filho.addClass("bi-chevron-double-right");
+                }
+            }
+
+            function alterColorLi(el) {
+                var filho = el;
+                if (filho.hasClass("item-list-perfil")) {
+                    filho.removeClass("item-list-perfil");
+                    filho.addClass("item-list-user");
+                } else if (filho.hasClass("item-list-user")) {
+                    filho.removeClass("item-list-user");
+                    filho.addClass("item-list-perfil");
+                }
+            }
+
+            function updateLists() {
+                var list2Items = $("#listUsuario").sortable("toArray", { attribute: "data-item-id" });
+                var funcionarioIdVal = $('#funcionarioId').val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Grupos", "Grupos")",
+                    dataType: "json",
+                    data: {
+                        funcionarioId: funcionarioIdVal,
+                        gruposUsuario: list2Items
+                    },
+                }).done(function (sucess) {
+                    if (sucess) {
+                        console.log("Listas atualizadas com sucesso!");
+                    }
+                });
+            }
+        });
+    </script>
+}

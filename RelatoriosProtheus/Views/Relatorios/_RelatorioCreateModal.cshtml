@@ -1,0 +1,352 @@
+﻿@model RelatoriosProtheus.Models.ViewModels.CreateRelatoriosViewModel
+
+<div class="modal fade" id="modalMensagemErro" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="relatorioCreateModal" tabindex="-1" aria-labelledby="relatorioCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="relatorioCreateModalLabel">Criar Relatório - Assistente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="wizardForm" asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="progress mb-4">
+                        <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Passo 1 de 3</div>
+                    </div>
+
+                    <div class="wizard-step" id="step1" style="display: block;">
+                        <div class="mb-3">
+                            <label asp-for="Nome" class="form-label"></label>
+                            <input asp-for="Nome" class="form-control" required />
+                            <span asp-validation-for="Nome" id="nomeId" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Descricao" id="descId" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Grupo</label>
+                            <select id="SelectedGrupoIds"  name="SelectedGrupoIds" class="form-select"
+                                    asp-items="@(ViewBag.Grupos as SelectList)">
+                                <option value="">Selecione um grupo</option>
+                            </select>
+                            <span id="selectId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="wizard-step" id="step2" style="display: none;">
+                        <div id="parametrosContainer">
+                            <div class="parametro-item mb-3 position-relative" data-index="0">
+                                <button type="button"
+                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 mt-1 me-1"
+                                        onclick="removeParametro(this)">
+                                    ×
+                                </button>
+                                <div class="row g-3">
+                                    <div class="col-md-5">
+                                        <label for="Items_0__Param" class="form-label">Nome do Parâmetro</label>
+                                        <input id="Items_0__Param" name="Items[0].Param" class="form-control" />
+                                        <span class="text-danger field-error" data-for="Items_0__Param"></span>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="Items_0__DescricaoEmTela" class="form-label">Descrição</label>
+                                        <input id="Items_0__DescricaoEmTela" name="Items[0].DescricaoEmTela" class="form-control" />
+                                        <span class="text-danger field-error" data-for="Items_0__DescricaoEmTela"></span>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="Items_0__Exemplo" class="form-label">Exemplo</label>
+                                        <input id="Items_0__Exemplo" name="Items[0].Exemplo" class="form-control" />
+                                        <span class="text-danger field-error" data-for="Items_0__Exemplo"></span>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="Items_0__Tipo" class="form-label">Tipo</label>
+                                        <select id="Items_0__Tipo" name="Items[0].Tipo" class="form-select">
+                                            <option value="">Selecione</option>
+                                            <option value="string">Texto</option>
+                                            <option value="int">Número</option>
+                                            <option value="date">Data</option>
+                                        </select>
+                                        <span class="text-danger field-error" data-for="Items_0__Tipo"></span>
+                                    </div>
+                                    <label class="form-check-label" for="Obrigatorio">Parâmetro Obrigatório?</label>
+                                    <div class="mb-4" style="display: inline-flex">
+                                        <div class="form-check" style="margin-right: 10px">
+                                            <input id="Items_0__Obrigatorio" name="Items[0].Obrigatorio" type="radio" value="1" />
+                                            <label class="form-check-label">Sim</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input id="Items_${paramIndex}__Obrigatorio" name="Items[${paramIndex}].Obrigatorio" type="radio" value="0" />
+                                            <label class="form-check-label">Não</label>
+                                        </div>
+                                        <span class="text-danger field-error" data-for="Items_0__Exemplo"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addParametro()">
+                            <i class="bi bi-plus"></i> Adicionar Parâmetro
+                        </button>
+                    </div>
+
+                    <div class="wizard-step" id="step3" style="display: none;">
+                        <div class="alert alert-success">
+                            <h5>Confirmação</h5>
+                            <p class="mb-0">Verifique os dados antes de finalizar o cadastro</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-5">
+                        <button type="button" class="btn btn-secondary" onclick="previousStep()" id="btnVoltar" style="display: none;">Voltar</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()" id="btnAvancar">Avançar</button>
+                        <button type="submit" class="btn btn-success" id="btnFinalizar" style="display: none;">Finalizar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    let paramIndex = 1;
+    let parametrosCount = 1;
+
+    function updateProgress() {
+        const progress = (currentStep / 3) * 100;
+        document.querySelector('.progress-bar').style.width = `${progress}%`;
+        document.querySelector('.progress-bar').textContent = `Passo ${currentStep} de 3`;
+    }
+
+    function toggleSteps() {
+        document.querySelectorAll('.wizard-step').forEach(step => {
+            step.style.display = 'none';
+        });
+        document.getElementById(`step${currentStep}`).style.display = 'block';
+    }
+
+    function nextStep() {
+        if (currentStep === 1 && !validateStep1()) return;
+
+        if (currentStep === 2 && !validateStep2()) return;
+
+        currentStep++;
+        updateNavigation();
+        toggleSteps();
+        updateProgress();
+    }
+
+    function previousStep() {
+        currentStep--;
+        updateNavigation();
+        toggleSteps();
+        updateProgress();
+    }
+
+    function validateStep1() {
+        const nomeField = document.getElementById('Nome');
+        const descField = document.getElementById('Descricao');
+        const selectField = document.getElementById('SelectedGrupoIds');
+
+        const nomeErr = document.getElementById('nomeId');
+        const descErr = document.getElementById('descId');
+        const selectErr = document.getElementById('selectId');
+
+        nomeErr.textContent = '';
+        descErr.textContent = '';
+        selectErr.textContent = '';
+
+        let isValid = true;
+
+        if (!nomeField.value.trim()) {
+            nomeErr.textContent = 'Por favor, informe o nome do relatório.';
+            isValid = false;
+        }
+
+        if (!descField.value.trim()) {
+            descErr.textContent = 'Por favor, informe a descrição do relatório.';
+            isValid = false;
+        }
+
+        if (!selectField.value) {
+            selectErr.textContent = 'Selecione pelo menos um grupo.';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function validateStep2() {
+        const items = document.querySelectorAll('.parametro-item');
+        let allValid = true;
+
+        items.forEach(item => {
+            const index = item.dataset.index;
+            const fields = [
+                { sel: `#Items_${index}__Param`, msg: 'Nome do parâmetro é obrigatório.' },
+                { sel: `#Items_${index}__DescricaoEmTela`, msg: 'Descrição é obrigatória.' },
+                { sel: `#Items_${index}__Exemplo`, msg: 'Exemplo é obrigatório.' },
+                { sel: `#Items_${index}__Tipo`, msg: 'Selecione um tipo.' }
+            ];
+
+            fields.forEach(f => {
+                const el = item.querySelector(f.sel);
+                if (el) {
+                    const errSpan = item.querySelector(`.field-error[data-for="${el.id}"]`);
+
+                    errSpan.textContent = '';
+
+                    if (!el.value || !el.value.trim()) {
+                        errSpan.textContent = f.msg;
+                        allValid = false;
+                    }
+                }
+            });
+        });
+
+        return allValid;
+    }
+
+    function updateNavigation() {
+        document.getElementById('btnVoltar').style.display = currentStep > 1 ? 'inline-block' : 'none';
+        document.getElementById('btnAvancar').style.display = currentStep < 3 ? 'inline-block' : 'none';
+        document.getElementById('btnFinalizar').style.display = currentStep === 3 ? 'inline-block' : 'none';
+    }
+
+    function addParametro() {
+        const newParam = `
+            <hr />
+            <div class="parametro-item mb-3 position-relative" data-index="${paramIndex}">
+                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 mt-1 me-1" onclick="removeParametro(this)">×</button>
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label">Nome do Parâmetro</label>
+                        <input id="Items_${paramIndex}__Param" name="Items[${paramIndex}].Param" class="form-control" placeholder="Nome do parâmetro" />
+                        <span class="text-danger field-error" data-for="Items_${paramIndex}__Param"></span>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Descrição</label>
+                        <input id="Items_${paramIndex}__DescricaoEmTela" name="Items[${paramIndex}].DescricaoEmTela" class="form-control" placeholder="Descrição" />
+                        <span class="text-danger field-error" data-for="Items_${paramIndex}__DescricaoEmTela"></span>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Exemplo</label>
+                        <input id="Items_${paramIndex}__Exemplo" name="Items[${paramIndex}].Exemplo" class="form-control" placeholder="Exemplo" />
+                        <span class="text-danger field-error" data-for="Items_${paramIndex}__Exemplo"></span>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Tipo</label>
+                        <select id="Items_${paramIndex}__Tipo" name="Items[${paramIndex}].Tipo" class="form-select">
+                            <option value="">Selecione</option>
+                            <option value="string">Texto</option>
+                            <option value="int">Número</option>
+                            <option value="date">Data</option>
+                        </select>
+                        <span class="text-danger field-error" data-for="Items_${paramIndex}__Tipo"></span>
+                    </div>
+                    <label class="form-check-label" for="Obrigatorio">Parâmetro Obrigatório?</label>
+                    <div class="mb-4" style="display: inline-flex">
+                        <div class="form-check" style="margin-right: 10px">
+                            <input id="Items_${paramIndex}__Obrigatorio" name="Items[${paramIndex}].Obrigatorio" type="radio" value="1" />
+                            <label class="form-check-label">Sim</label>
+                        </div>
+                        <div class="form-check">
+                            <input id="Items_${paramIndex}__Obrigatorio" name="Items[${paramIndex}].Obrigatorio" type="radio" value="0" />
+                            <label class="form-check-label">Não</label>
+                        </div>
+                        <span asp-validation-for="GrupoSeparacao" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>`;
+
+        document.getElementById('parametrosContainer').insertAdjacentHTML('beforeend', newParam);
+        paramIndex++;
+        parametrosCount++;
+    }
+
+    function removeParametro(button) {
+
+        const item = button.closest('.parametro-item');
+        item.remove();
+        parametrosCount--;
+
+        reindexParams();
+    }
+
+    function reindexParams() {
+        const items = document.querySelectorAll('.parametro-item');
+        let newIndex = 0;
+
+        items.forEach((item) => {
+            const fields = ['Param', 'DescricaoEmTela', 'Exemplo', 'Tipo'];
+
+            fields.forEach(field => {
+                const input = item.querySelector(`[id^="Items_"]`);
+                if (input) {
+                    const newId = `Items_${newIndex}__${field}`;
+                    input.id = newId;
+
+                    const errSpan = item.querySelector(`.field-error[data-for^="Items_"]`);
+                    if (errSpan) {
+                        errSpan.setAttribute('data-for', newId);
+                    }
+                }
+            });
+
+            newIndex++;
+        });
+
+        paramIndex = newIndex;
+    }
+
+    document.getElementById('wizardForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                $('#relatorioCreateModal').modal('hide');
+                window.location.reload();
+            } else {
+                return response.text();
+            }
+        })
+        .then(html => {
+            if (html) {
+                document.getElementById('relatorioCreateModal').querySelector('.modal-body').innerHTML = html;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        parametrosCount = document.querySelectorAll('.parametro-item').length;
+    });
+
+    $('#modal-container').change(
+        function() {
+            $.validator.unobtrusive.parse("#wizardForm");
+    });
+</script>

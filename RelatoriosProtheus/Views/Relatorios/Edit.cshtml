@@ -1,0 +1,158 @@
+﻿@model RelatoriosProtheus.Models.ViewModels.RelatorioEditViewModel
+
+@{
+    ViewData["Title"] = "Editar";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Editar Relatório: @Model.Nome</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" id="relatorioForm">
+                <input type="hidden" asp-for="Id" />
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Nome" class="form-label">Nome</label>
+                            <input asp-for="Nome" class="form-control" />
+                            <span asp-validation-for="Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Descricao" class="form-label">Descrição</label>
+                            <input asp-for="Descricao" class="form-control" />
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="SelectedGrupoId" class="form-label">Grupo</label>
+                            <select asp-for="SelectedGrupoId" class="form-select" asp-items="@(ViewBag.GruposEdit as SelectList)">
+                                <option value="">Selecione um grupo</option>
+                            </select>
+                            <span asp-validation-for="SelectedGrupoId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Parâmetros</label>
+                            <button type="button" class="btn btn-sm btn-success" onclick="adicionarParametro()">+ Adicionar</button>
+                        </div>
+                        <div id="parametros-container">
+                            @for (int i = 0; i < Model.Parametros.Count; i++)
+                            {
+                                <div class="border rounded p-3 mb-3 parametro-item">
+                                    <input type="hidden" name="Parametros[@i].Id" value="@Model.Parametros[i].Id" />
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Parâmetro</label>
+                                        <input name="Parametros[@i].Param" class="form-control" value="@Model.Parametros[i].Param" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Descrição na Tela</label>
+                                        <input name="Parametros[@i].DescricaoEmTela" class="form-control" value="@Model.Parametros[i].DescricaoEmTela" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Exemplo</label>
+                                        <input name="Parametros[@i].Exemplo" class="form-control" value="@Model.Parametros[i].Exemplo" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Tipo</label>
+                                        <select name="Parametros[@i].Tipo" class="form-select">
+                                            <option value="">-- selecione --</option>
+                                            <option value="string" selected="@(Model.Parametros[i].Tipo == "string")">Texto</option>
+                                            <option value="int" selected="@(Model.Parametros[i].Tipo == "int")">Número</option>
+                                            <option value="date" selected="@(Model.Parametros[i].Tipo == "date")">Data</option>
+                                        </select>
+                                    </div>
+                                    <label class="form-check-label" for="Obrigatorio">Parâmetro Obrigatório?</label>
+                                    <div class="mb-4" style="display: inline-flex">
+                                        <div class="form-check" style="margin-right: 10px">
+                                            <input asp-for="Parametros[@i].Obrigatorio" type="radio" value="0" />
+                                            <label class="form-check-label">Sim</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input asp-for="Parametros[@i].Obrigatorio" type="radio" value="1" />
+                                            <label class="form-check-label">Não</label>
+                                        </div>
+                                    </div>
+
+                                    <br />
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerParametro(this)">Remover</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let index = @Model.Parametros.Count;
+
+        function adicionarParametro() {
+            const container = document.getElementById('parametros-container');
+
+            const html = `
+            <div class="border rounded p-3 mb-3 parametro-item">
+                <input type="hidden" name="Parametros[${index}].Id" value="0" />
+                <div class="mb-2">
+                    <label class="form-label">Parâmetro</label>
+                    <input name="Parametros[${index}].Param" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Descrição na Tela</label>
+                    <input name="Parametros[${index}].DescricaoEmTela" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Exemplo</label>
+                    <input name="Parametros[${index}].Exemplo" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Tipo</label>
+                    <select name="Parametros[${index}].Tipo" class="form-select">
+                        <option value="">-- selecione --</option>
+                        <option value="string">Texto</option>
+                        <option value="int">Número</option>
+                        <option value="date">Data</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerParametro(this)">Remover</button>
+            </div>`;
+
+            container.insertAdjacentHTML('beforeend', html);
+            index++;
+        }
+
+        function renumerarParametros() {
+          const items = document.querySelectorAll('#parametros-container .parametro-item');
+          items.forEach((item, idx) => {
+            item.querySelectorAll('[name]').forEach(el => {
+              el.name = el.name.replace(/Parametros\[\d+]/, `Parametros[${idx}]`);
+            });
+          });
+          index = items.length;
+        }
+
+        function removerParametro(btn) {
+          const bloco = btn.closest('.parametro-item');
+          if (bloco) bloco.remove();
+          renumerarParametros();
+        }
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

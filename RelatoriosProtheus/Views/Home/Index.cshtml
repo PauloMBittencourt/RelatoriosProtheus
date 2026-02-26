@@ -1,0 +1,101 @@
+﻿@using RelatoriosProtheus.Models.Entities
+@model RelatoriosProtheus.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/RelatoriosProtheus.styles.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" asp-append-version="true" />
+
+<style>
+    .logo-text {
+        font-family: 'Pacifico', cursive;
+        color: #4F46E5;
+    }
+
+    .custom-checkbox .form-check-input:checked {
+        background-color: #4F46E5;
+        border-color: #4F46E5;
+    }
+
+    .password-toggle-icon {
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+
+<body class="bg-light min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <img class="pb-3" src="~/img/SESI_SENAI.png" width="300px" />
+                            <br />
+                            <h2 class="h4 text-dark mb-2">Relatórios Protheus</h2>
+                            <p class="text-muted">Bem-vindo de volta! Por favor, entre com suas credenciais.</p>
+                        </div>
+
+                        @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                        {
+                            <span class="form-label mb-2">Empresa</span>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                </span>
+                                <select asp-for="Empresa" class="form-select" asp-items="Html.GetEnumSelectList<Empresa>()">
+                                    <option disabled selected>Selecionar...</option>
+                                </select>
+                                <span asp-validation-for="Empresa" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.Matricula, new { @class = "form-label" })
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-circle"></i>
+                                    </span>
+                                    <input asp-for="Matricula" class="form-control" placeholder="Digite sua matrícula" />
+                                    <span asp-validation-for="Matricula" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.Senha, new { @class = "form-label" })
+                                @Html.ValidationMessageFor(m => m.Senha)
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-lock-fill"></i>
+                                    </span>
+                                    @Html.PasswordFor(m => m.Senha, new { @class = "form-control", placeholder = "Digite sua senha", id = "senha" })
+                                    <span class="password-toggle-icon">
+                                        <i class="ri-eye-line" id="togglePassword"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Entrar</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('senha');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('ri-eye-off-line');
+        });
+    </script>
+</body>

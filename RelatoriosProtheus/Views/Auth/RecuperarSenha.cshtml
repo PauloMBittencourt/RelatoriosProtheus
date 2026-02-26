@@ -1,0 +1,127 @@
+﻿@model RelatoriosProtheus.Models.ViewModels.EsqueceuSenhaViewModel
+
+@{
+    ViewData["Title"] = "Esqueceu sua senha?";
+}
+
+<style>
+    :root {
+        --primary-color: #4A90E2;
+        --secondary-color: #ffffff;
+        --background-color: #f5f7fb;
+        --text-color: #333333;
+        --border-radius: 8px;
+        --transition: 0.3s ease;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+    }
+
+    .container-es {
+        background-color: var(--secondary-color);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+        .container-es h1 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .container-es p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            color: #666666;
+        }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+        text-align: left;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cccccc;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border var(--transition);
+        }
+
+            .form-group input:focus {
+                border-color: var(--primary-color);
+                outline: none;
+            }
+
+    .btn {
+        display: inline-block;
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+        text-transform: uppercase;
+        font-weight: 500;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: background-color var(--transition);
+    }
+
+        .btn:hover {
+            background-color: darken(var(--primary-color), 10%);
+        }
+
+    .back-link {
+        display: block;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color var(--transition);
+    }
+
+        .back-link:hover {
+            color: darken(var(--primary-color), 10%);
+        }
+
+    .container-es h1 {
+        font-size: 1.5rem;
+    }
+</style>
+<div class="body">
+    <div class="container-es">
+        <h1>Esqueci Minha Senha</h1>
+        <p>Digite seu e-mail abaixo para receber um link de redefinição.</p>
+        <form asp-action="RecuperarSenha" asp-controller="Auth" method="POST">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Email">E-mail</label>
+                <input asp-for="Email" type="email" id="email" name="email" placeholder="seu.email@exemplo.com" required>
+            </div>
+            <button type="submit" class="btn">Enviar</button>
+        </form>
+        <a asp-action="Login" class="back-link">Voltar ao login</a>
+    </div>
+</div>

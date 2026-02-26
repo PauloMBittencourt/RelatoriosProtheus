@@ -1,0 +1,82 @@
+﻿@model RelatoriosProtheus.Models.ViewModels.RelatorioComParametrosViewModel
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="modal fade" id="relatorioModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="paramContainer">
+                <form id="relatorioForm" asp-controller="Relatorios" asp-action="Executar" method="post" target="pdfFrame">
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">@Model.Nome</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input asp-for="RelatorioId" type="hidden" />
+                        <input asp-for="Acao" type="hidden" />
+
+                        @for (int i = 0; i < Model.Parametros.Count; i++)
+                        {
+                            var isReq = Model.Parametros[i].Obrigatorio == 1;
+                            var message = $"O parâmetro {Model.Parametros[i].Param} é obrigatório ser preenchido!";
+
+                            <div class="mb-3">
+                                <label class="form-label"><strong>@Model.Parametros[i].Param</strong></label>
+                                <div class="form-text text-muted">
+                                    Descrição: @Model.Parametros[i].DescricaoEmTela
+                                </div>
+
+                                <input asp-for="Parametros[i].Param" type="hidden" />
+                                <input asp-for="Parametros[i].DescricaoEmTela" type="hidden" />
+                                <input asp-for="Parametros[i].Exemplo" type="hidden" />
+                                <input asp-for="Parametros[i].Tipo" type="hidden" />
+
+                                <input asp-for="Parametros[i].Valor"
+                                       class="form-control"
+                                       placeholder="Ex: @Model.Parametros[i].Exemplo" 
+                                       data-obrigatorio="@Model.Parametros[i].Obrigatorio" />
+
+                            </div>
+                            <input asp-for="TipoArquivo" hidden />
+                            <span asp-validation-for="Parametros[i].Valor" class="text-danger"></span>
+                        }
+
+                        <div class="alert alert-warning mt-5">
+                            Datas devem ser colocadas entre aspas únicas, o formato será passado na própria descrição
+                            <br />
+                            Exemplo: <code>'01/01/2021'</code>.
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Executar</button>
+                        <a asp-action="Index" asp-controller="Relatorios" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        $(function () {
+        $('input[name$=".Valor"]').each(function () {
+            var $el = $(this);
+            var obrigatorio = $el.data('obrigatorio');
+            if (obrigatorio === 0) {
+                $el.attr('required', 'required');
+                $el.attr('data-val', 'true');
+                $el.attr('data-val-required', `O parâmetro é obrigatório.`);
+            } else {
+                $el.removeAttr('required');
+                $el.removeAttr('data-val');
+                $el.removeAttr('data-val-required');
+            }
+        });
+    });
+</script>

@@ -1,0 +1,13 @@
+﻿@model IEnumerable<RelatoriosProtheus.Models.ViewModels.RelatorioFiltroViewModel>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<button type="button"
+        class="btn btn-success mb-4"
+        data-bs-toggle="modal"
+        data-bs-target="#relatorioCreateModal">
+    <i class="bi bi-plus-circle"></i> Novo Relatório
+</button>
+
+@await Html.PartialAsync("_RelatorioCreateModal", new RelatoriosProtheus.Models.Entities.Relatorios())
